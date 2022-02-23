@@ -8,16 +8,34 @@
 import UIKit
 
 class PostTableViewCell: UITableViewCell {
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    //MARK: Outlets
+    @IBOutlet weak var postImageView: UIImageView!
+    @IBOutlet weak var postTitleLabel: UILabel!
+    @IBOutlet weak var postUpsLabel: UILabel!
+    //MARK: Properties
+    var post: Post?{
+        didSet{
+            updateViews()
+        }
+    }
+    //MARK: Helper methods
+    func updateViews(){
+        guard let post = post else {return}
+        postTitleLabel.text = post.title
+        postUpsLabel.text = "Upvotes: \(post.ups)"
+        
+        PostController.fetchThumbnailFor(post: post) { result in
+            DispatchQueue.main.async {
+                switch result{
+                case .success(let thumbnail):
+                    self.postImageView.image = thumbnail
+                case .failure(let error):
+                    self.postImageView.image = UIImage(systemName: "photo.on.rectangle")
+                    print("❌error getting thumbnail \(#function)❌")
+                }
+            }
+        }
+        
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
-}
+}//end of class
